@@ -37,7 +37,7 @@ var App = React.createClass({
                 value={this.state.value}
                 onChange={this.handleChange}
                 /> 
-                <Responses val="response count:" jsonURI="json!./data.json"/>
+                <Responses val="response count:" jsonURI="json!./mockdata1.json"/>
             </div>
         );
     }
@@ -51,7 +51,7 @@ var Responses = React.createClass({
     getDefaultProps() {
         return {
             val: '100',
-            jsonURI : 'json!./data.json'
+            jsonURI : 'json!./mockdata1.json'
         }
     },
     getInitialState() {
@@ -118,7 +118,7 @@ var Responses = React.createClass({
     },
     componentDidMount() {
         var val = this.props.val;
-        var json = require('json!./data.json');
+        var json = require('json!./mockdata1.json');
         var len = json.responses.length;
         this.setState({len: len});
         var obj1 = json.responses[0];
@@ -277,7 +277,7 @@ var Responses = React.createClass({
         return (
             <div>
                 <h3>Response count: {this.state.len}</h3>
-                <h3>file location: {this.props.jsonURI}</h3>
+                <h3>data source: {this.props.jsonURI}</h3>
                 
                 <p>Select two variables to calculate correlation for:</p>
                 <select onChange={this.changeHandlerX}>{this.state.options}</select>
