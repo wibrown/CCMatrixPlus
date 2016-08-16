@@ -1,28 +1,10 @@
 import React from 'react';
 import ReactDOM from 'react-dom';
 
-// var data = [{
-//         "id": "1",
-//         "response" : "yes"
-//     },  {
-//         "id": "2",
-//         "response" : "no"
-//     },  {
-//         "id": "3",
-//         "response" : "yes"
-//     },  {
-//         "id": "4",
-//         "response" : "yes"
-//     },  {
-//         "id": "5",
-//         "response" : "no"
-// }]
-
-
 
 var App = React.createClass({
     getInitialState() {
-        return {value: 'Hello!', html: '<h3>{this.state.value}</h3>', json: ''};
+        return {value: 'mockdata1.json'};
     },
     handleChange(event) {
         this.setState({value: event.target.value});
@@ -30,14 +12,10 @@ var App = React.createClass({
     render() {
         return (
             <div>
-                <h1>Correlation Coefficient Matrix</h1>
-                <p>Demo version: User must manually enter the file location for the jsonURI property value in the source code.</p>
-                <input 
-                type="text"
-                value={this.state.value}
-                onChange={this.handleChange}
-                /> 
-                <Responses val="response count:" jsonURI="json!./mockdata1.json"/>
+                <h3>CCMatrixPlus is a web application for statistical analysis of JSON data, built on React.js and Node.</h3>
+                <p>In this demo version of the application, data sources are hard-coded in the App.js file. The option to upload data to the web from a local file may be added in a later version.</p>
+                <p>Data source: mockdata1.json</p>
+                <Responses jsonURI="json!./mockdata1.json"/>
             </div>
         );
     }
@@ -45,7 +23,6 @@ var App = React.createClass({
 
 var Responses = React.createClass({
     propTypes: {
-        val: React.PropTypes.string.isRequired,
         jsonURI: React.PropTypes.string.isRequired
     },
     getDefaultProps() {
@@ -60,7 +37,7 @@ var Responses = React.createClass({
             y: 0,
             fx: 0,
             fy: 0,
-            fu: 0,
+            fu: 100,
             fd: 0,
             fa: 0,
             fsd: 0,
@@ -74,7 +51,8 @@ var Responses = React.createClass({
             corrtext: '',
             filter: [],
             dummy: 0,
-            filttext: ''
+            filttext: '',
+            json: require('json!./mockdata1.json')
         }
     },
     changeHandlerX(event) {
@@ -92,32 +70,105 @@ var Responses = React.createClass({
     },
     changeHandlerFX(event) {
         this.setState({fx: event.target.value});
-        var filttext = 
-        this.setState({filttext: corrtext});
-        
-        
+        var json = this.state.json;
+        var vars = this.state.vars;
+        var data = [];
+        for (var i = 0; i < this.state.len; i++) {
+            if ((json.responses[i][vars[this.state.fy]] <= this.state.fu) && (json.responses[i][vars[this.state.fy]] >= this.state.fd)){
+                data.push(json.responses[i][vars[this.state.fx]]);
+            }     
+        }
+        var sum = 0;
+        for(var k = 0; k < data.length; k++){
+            sum += data[k];
+        }
+        var avg = sum / data.length;
+        this.setState({fa: avg});
+        var sqsum = 0;
+        for(var k = 0; k < data.length; k++){
+            sqsum += ((data[k] - avg) * (data[k] - avg));
+        }
+        var stddev = Math.sqrt(sqsum / data.length);
+        this.setState({fsd: stddev});
+        // console.log(data);
+        console.log(vars);
     },
     changeHandlerFY(event) {
         this.setState({fy: event.target.value});
-        var corrtext = 'Correlation between ' + this.state.vars[this.state.x] + ' and '+ this.state.vars[event.target.value] + ': ' + this.state.results[this.state.x][event.target.value];
-        this.setState({corrtext: corrtext});
+        var json = this.state.json;
+        var vars = this.state.vars;
+        var data = [];
+        for (var i = 0; i < this.state.len; i++) {
+            if ((json.responses[i][vars[this.state.fy]] <= this.state.fu) && (json.responses[i][vars[this.state.fy]] >= this.state.fd)){
+                data.push(json.responses[i][vars[this.state.fx]]);
+            }     
+        }
+        var sum = 0;
+        for(var k = 0; k < data.length; k++){
+            sum += data[k];
+        }
+        var avg = sum / data.length;
+        this.setState({fa: avg});
+        var sqsum = 0;
+        for(var k = 0; k < data.length; k++){
+            sqsum += ((data[k] - avg) * (data[k] - avg));
+        }
+        var stddev = Math.sqrt(sqsum / data.length);
+        this.setState({fsd: stddev});
         
     },
     changeHandlerFU(event) {
         this.setState({fu: event.target.value});
-        var corrtext = 'Correlation between ' + this.state.vars[event.target.value] + ' and '+ this.state.vars[this.state.y] + ': ' + this.state.results[event.target.value][this.state.y];
-        this.setState({corrtext: corrtext});
-        
+        var json = this.state.json;
+        var vars = this.state.vars;
+        var data = [];
+        for (var i = 0; i < this.state.len; i++) {
+            if ((json.responses[i][vars[this.state.fy]] <= this.state.fu) && (json.responses[i][vars[this.state.fy]] >= this.state.fd)){
+                data.push(json.responses[i][vars[this.state.fx]]);
+            }     
+        }
+        var sum = 0;
+        for(var k = 0; k < data.length; k++){
+            sum += data[k];
+        }
+        var avg = sum / data.length;
+        this.setState({fa: avg});
+        var sqsum = 0;
+        for(var k = 0; k < data.length; k++){
+            sqsum += ((data[k] - avg) * (data[k] - avg));
+        }
+        var stddev = Math.sqrt(sqsum / data.length);
+        this.setState({fsd: stddev});
         
     },
     changeHandlerFD(event) {
         this.setState({fd: event.target.value});
-        var corrtext = 'Correlation between ' + this.state.vars[this.state.x] + ' and '+ this.state.vars[event.target.value] + ': ' + this.state.results[this.state.x][event.target.value];
-        this.setState({corrtext: corrtext});
-        
+        var json = this.state.json;
+        var vars = this.state.vars;
+        var data = [];
+        for (var i = 0; i < this.state.len; i++) {
+            if ((json.responses[i][vars[this.state.fy]] <= this.state.fu) && (json.responses[i][vars[this.state.fy]] >= this.state.fd)){
+                data.push(json.responses[i][vars[this.state.fx]]);
+            }     
+        }
+        var sum = 0;
+        for(var k = 0; k < data.length; k++){
+            sum += data[k];
+        }
+        var avg = sum / data.length;
+        this.setState({fa: avg});
+        var sqsum = 0;
+        for(var k = 0; k < data.length; k++){
+            sqsum += ((data[k] - avg) * (data[k] - avg));
+        }
+        var stddev = Math.sqrt(sqsum / data.length);
+        this.setState({fsd: stddev});
+        console.log(this.state.fa);
+
     },
     componentDidMount() {
         var val = this.props.val;
+        var json1 = require('json!./mockdata1.json');
         var json = require('json!./mockdata1.json');
         var len = json.responses.length;
         this.setState({len: len});
@@ -183,7 +234,7 @@ var Responses = React.createClass({
                 }
                 var covariance = (covsum / data1.length) - (avg1 * avg2);
                 var correlation = (covariance / (stddev1 * stddev2));
-                var rgb = Math.floor(correlation*255);
+                var rgb = Math.round(correlation*255);
                 if (isNaN(rgb)) {
                     rgb = 0;
                 }
@@ -209,7 +260,7 @@ var Responses = React.createClass({
                         rgbString = '#'+r.toString(16)+g.toString(16)+b.toString(16);
                     }                  
                 }
-                var int = Math.floor(rgb / 256 * 100);
+                var int = Math.round(rgb / 256 * 100);
                 htmlrow.push(<td style={{border: '1px solid black', background: rgbString}}>{int}</td>);
                 console.log(this.state.x+' '+this.state.y);               
                 // console.log("Correlation between "+var1+" and "+var2+": "+correlation + " color hex: " + rgbString);
@@ -231,18 +282,13 @@ var Responses = React.createClass({
         };
         this.setState({varlist: varlist});
         this.setState({htmlrows: htmlrows});
-        this.makeFilter();
-    },
-    makeFilter() {
         var filter = [];
-        var json = require('json!./data.json');
+        var json = require('json!./mockdata1.json');
         var opts = [];
-        for (var i = 0; i < 100; i++) {
-            opts.push(<option value = {i}>{i}</option>);
+        for (var i = 0; i <= 100; i++) {
+            opts.push(<option value={i}>{i}</option>);
         }
-        this.setState({opts: opts}, function(){
-            console.log(this.state.opts);
-        });
+        this.setState({opts: opts});
         var data = [];
         for (var i = 0; i < this.state.len; i++) {
             if ((json.responses[i][vars[this.state.fy]] <= this.state.fu) && (json.responses[i][vars[this.state.fy]] >= this.state.fd)){
@@ -261,114 +307,51 @@ var Responses = React.createClass({
         }
         var stddev = Math.sqrt(sqsum / data.length);
         this.setState({fsd: stddev});
-        filter.push(
-            <div>
-            <select onChange={this.changeHandlerFX}>{this.state.options}</select>
-            <select onChange={this.changeHandlerFY}>{this.state.options}</select>
-            <select onChange={this.changeHandlerFU}>{this.state.opts}</select>
-            <select onChange={this.changeHandlerFD}>{this.state.opts}</select></div>);
-        this.setState({filter: filter}, function() {
-            console.log(this.state.filter);
-        });
-        
-        // need: json loaded, sliders to 
+        console.log(data);
     },
     render() {
         return (
-            <div>
-                <h3>Response count: {this.state.len}</h3>
-                <h3>data source: {this.props.jsonURI}</h3>
-                
-                <p>Select two variables to calculate correlation for:</p>
+            <div class="container">
+            <div class="row">
+                <p>Number of rows analyzed: {this.state.len}</p>
+                <h5>CCMatrixPlus provides a number of tools for analyzing your data -- a correlation coefficient calculator, a correlation coefficient matrix, a table of variable statistics, and a filtering system that uses one variable to constrain the row set of another.</h5>
+            </div>
+            <br></br>
+            <h3>Correlation Calculator</h3>
+            <p>This tool allows you to determine the statistical correlation between any two variables in your data set.
+            A correlation of 1 represents a perfect positive relationship, a correlation of -1 represents a perfect negative relationship, and a correlation of 0 represents the lack of a relationship.  
+            The formula for the Pearson product-movement correlation coefficient is used to determine the results.</p>
+                <p>Select two variables to calculate the correlation between:</p>
                 <select onChange={this.changeHandlerX}>{this.state.options}</select>
                 <select onChange={this.changeHandlerY}>{this.state.options}</select>
                 <p>{this.state.corrtext}</p>
+                <br></br>
+            <div class="row">
+            <div class="col-sm-1">
+            <h3>Correlation Coefficient Matrix</h3>
+            <p>This tool visually depicts the correlation coefficients for all pairs of variables in the data set. Numbers on the top and right side correspond to the index of each variable, which can be referenced via the dropdowns in the above calculators, or via the stat table below.
+            Coefficients are normalized between -100 and 100, which roughly indicates the percentage of correlation between the variables. 
+            Shades of blue represent positive values while shades of red represent negative values. 
+            It is worth noting that all variables have a perfect correlation with themselves, which explains the solid blue diagonal on the matrix.</p>
                 <table style={{border: '2px solid red'}}><tbody>{this.state.htmlrows}</tbody></table>
-                <br></br>
-                <table style={{border: '2px solid blue'}}><tbody>{this.state.varlist}</tbody></table>
-                <br></br>
-                <br></br>
-                <br></br>
-                <br></br>
-                <Filter />
-            </div>       
-        )
-    }
-});
-
-var Selector = React.createClass({
-    propTypes: {
-        vars: React.PropTypes.array.isRequired,
-        results: React.PropTypes.array.isRequired
-    },
-    getDefaultProps(){
-        return {
-            vars: [],
-            results: []
-        }
-    },
-    getInitialState() {
-        return {
-            x : 0,
-            y: 0
-        }
-    },
-    changeHandlerX(event) {
-        this.state.x = event.target.value;
-        console.log(this.state.x);
-    },
-    changeHandlerY(event) {
-        this.state.y = event.target.value;
-        console.log(this.state.y);
-        console.log(vars);
-    },
-    render() {
-        var options = [];
-        // building up option dropdown for bold selection
-        for (var i = 0; i < vars.length; i++) {
-            options.push(<option value = {i}>{vars[i]}</option>);
-        }
-        return(
-            <div>
-                <select onChange={this.changeHandlerX}>{options}</select>
-                <select onChange={this.changeHandlerY}>{options}</select>
-                <p>Correlation between {vars[this.state.x]} and {vars[this.state.y]}: {results[this.state.x][this.state.y]}</p>
             </div>
-        );
-    }
-});
-
-var Filter = React.createClass({
-    render() {
-        return(
-            <div>;)</div>
-        );
-    }
-});
-
-var Cell = React.createClass({
-    propTypes: {
-        val: React.PropTypes.number.isRequired
-    },
-    render() {
-        return(
-            <table border="1">
-            <tbody>
-              <tr>
-                <th>Month</th>
-                <th>Savings</th>
-              </tr>
-              <tr>
-                <td>January</td>
-                <td>$100</td>
-              </tr>
-              <tr>
-                <td>February</td>
-                <td>$50</td>
-              </tr>
-            </tbody>
-            </table>
-        );
+            <br></br>
+            <h3>Statistics Table</h3>
+            <p>This table displays the average and standard deviation for each variable.</p>
+            <div class="col-sm-1">
+                <table style={{border: '2px solid blue'}}><tbody>{this.state.varlist}</tbody></table>
+            </div>
+            <h3>Filter</h3>
+            <p>Currently broken. Trying to fix.</p>
+            <select onChange={this.changeHandlerFX}>{this.state.options}</select>
+            <select onChange={this.changeHandlerFY}>{this.state.options}</select>
+            <select onChange={this.changeHandlerFD}>{this.state.opts}</select>
+            <select onChange={this.changeHandlerFU} value='100'>{this.state.opts}</select>
+            <p>{this.state.fa}, {this.state.fsd}</p>
+            <br></br>
+            </div>
+            </div>    
+        )
     }
 });
 
